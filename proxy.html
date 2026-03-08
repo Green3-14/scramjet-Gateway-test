@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Scramjet Gateway</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b0d14;--surface:#12151f;--border:#1e2235;--accent:#4f6ef7;--accent2:#7c3aed;--text:#e2e8f0;--muted:#64748b;--danger:#ef4444;--success:#22c55e;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden;}
+
+    /* ── Toolbar ── */
+    #toolbar{display:flex;align-items:center;gap:8px;background:var(--surface);border-bottom:1px solid var(--border);padding:8px 12px;flex-shrink:0;}
+    .tb-logo{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.08em;flex-shrink:0;white-space:nowrap;}
+    #urlBar{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:7px 12px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;outline:none;min-width:0;}
+    #urlBar:focus{border-color:var(--accent);}
+    .tb-btn{background:var(--border);border:none;border-radius:6px;color:var(--text);padding:7px 11px;cursor:pointer;font-size:12px;font-weight:600;transition:background .15s;flex-shrink:0;white-space:nowrap;font-family:'DM Sans',sans-serif;}
+    .tb-btn:hover{background:var(--accent);}
+    .tb-btn.danger:hover{background:var(--danger);}
+
+    /* ── Status bar ── */
+    #statusBar{background:var(--surface);border-bottom:1px solid var(--border);padding:3px 12px;font-size:11px;color:var(--muted);font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .sdot{width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;transition:background .4s;}
+
+    /* ── Content area ── */
+    #contentArea{flex:1;overflow:hidden;position:relative;}
+    #loadOverlay{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;z-index:50;transition:opacity .3s;}
+    #loadOverlay.hidden{opacity:0;pointer-events:none;}
+    .spinner{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    #loadLabel{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);text-align:center;padding:0 20px;}
+    #proxyFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}
+    #errorPane{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px;text-align:center;}
+    #errorPane.show{display:flex;}
+    #errorPane h2{font-family:'Space Mono',monospace;color:var(--danger);font-size:17px;}
+    #errorPane p{color:var(--muted);font-size:13px;line-height:1.7;max-width:500px;}
+    .retry-btn{background:var(--accent);color:white;border:none;border-radius:8px;padding:9px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+
+    /* ── Stream monitor ── */
+    #streamPanel{position:fixed;bottom:0;left:0;right:0;height:0;background:rgba(11,13,20,.98);border-top:1px solid var(--border);overflow:hidden;transition:height .25s;z-index:200;}
+    #streamPanel.open{height:190px;}
+    .sp-header{padding:5px 12px;border-bottom:1px solid var(--border);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:.08em;display:flex;justify-content:space-between;align-items:center;font-family:'Space Mono',monospace;}
+    #streamLog{height:calc(100% - 28px);overflow-y:auto;padding:6px 12px;line-height:1.9;font-family:'Space Mono',monospace;font-size:11px;}
+    .le .ts{color:var(--border);margin-right:8px;}
+    .le .ok{color:var(--success);}
+    .le .er{color:var(--danger);}
+    .le .in{color:var(--accent);}
+  </style>
+</head>
+<body>
+
+<div id="toolbar">
+  <span class="tb-logo">&#9889; GATEWAY</span>
+  <input id="urlBar" type="text" placeholder="Enter URL to browse..."/>
+  <button class="tb-btn" id="goBtn">GO</button>
+  <button class="tb-btn" id="reloadBtn">&#8634;</button>
+  <button class="tb-btn" id="monitorBtn">STREAMS</button>
+  <button class="tb-btn danger" id="exitBtn">EXIT &#8594; CLEVER</button>
+</div>
+
+<div id="statusBar">
+  <div class="sdot" id="statusDot"></div>
+  <span id="statusText">Initializing gateway engine...</span>
+</div>
+
+<div id="contentArea">
+  <div id="loadOverlay">
+    <div class="spinner"></div>
+    <div id="loadLabel">Starting up...</div>
+  </div>
+  <iframe id="proxyFrame"
+    sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals"
+    allowfullscreen>
+  </iframe>
+  <div id="errorPane">
+    <h2>&#9888; GATEWAY ERROR</h2>
+    <p id="errorText"></p>
+    <button class="retry-btn" id="retryBtn">RETRY</button>
+  </div>
+</div>
+
+<div id="streamPanel">
+  <div class="sp-header">
+    <span>&#9889; STREAM MONITOR</span>
+    <span id="closeMonitor" style="cursor:pointer;color:var(--muted)">&#10005; CLOSE</span>
+  </div>
+  <div id="streamLog"></div>
+</div>
+
+<script>
+  // ============================================================
+  //  CONFIG
+  //  WORKER_URL = your Cloudflare Worker bare server URL
+  //  Update this after you deploy worker.js
+  // ============================================================
+  var WORKER_URL = "https://scramjet-gateway-worker.YOUR-SUBDOMAIN.workers.dev";
+
+  var CLEVER_URL = "https://clever.com/oauth/authorize?channel=clever&client_id=4c63c1cf623dce82caac&confirmed=true&redirect_uri=https%3A%2F%2Fclever.com%2Fin%2Fauth_callback&response_type=code&state=72ebd98f122166e9e516fb2c8aae1f8085300648e43a91970179fc4dc8cd1827&district_id=5d4d9facff76bc000146dc2c";
+
+  var DEFAULT_TARGET = "https://neverssl.com";
+  var currentURL = DEFAULT_TARGET;
+
+  // ── DOM refs ──
+  var urlBar      = document.getElementById("urlBar");
+  var loadOverlay = document.getElementById("loadOverlay");
+  var loadLabel   = document.getElementById("loadLabel");
+  var proxyFrame  = document.getElementById("proxyFrame");
+  var errorPane   = document.getElementById("errorPane");
+  var statusDot   = document.getElementById("statusDot");
+  var statusText  = document.getElementById("statusText");
+  var streamPanel = document.getElementById("streamPanel");
+  var logEl       = document.getElementById("streamLog");
+
+  urlBar.value = DEFAULT_TARGET;
+
+  // ── Logger ──
+  function log(cls, msg) {
+    var ts = new Date().toISOString().split("T")[1].slice(0, 8);
+    var d = document.createElement("div");
+    d.className = "le";
+    d.innerHTML = "<span class=ts>" + ts + "</span><span class=" + cls + ">" + msg + "</span>";
+    logEl.appendChild(d);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+
+  // ============================================================
+  //  SCRAMJET-STYLE TRANSFORMSTREAM PIPELINE
+  //  1. URL rewriter  — rewrites src/href/url() in HTML chunks
+  //  2. Script inject — injects navigation interceptor into page
+  //  3. Chunk monitor — logs byte throughput
+  // ============================================================
+
+  function makeURLTransform(base) {
+    var dec = new TextDecoder(), enc = new TextEncoder();
+    return new TransformStream({
+      transform: function(chunk, ctrl) {
+        var html = dec.decode(chunk, { stream: true });
+        // Rewrite src/href/action attributes
+        html = html.replace(/(src|href|action)=["'](?!data:|javascript:|#|mailto:)([^"']+)["']/gi, function(m, attr, url) {
+          try { return attr + '="__GW__' + new URL(url, base).href + '"'; } catch(e) { return m; }
+        });
+        // Rewrite CSS url()
+        html = html.replace(/url\(["']?(?!data:)([^"')]+)["']?\)/gi, function(m, url) {
+          try { return 'url("__GW__' + new URL(url, base).href + '")'; } catch(e) { return m; }
+        });
+        ctrl.enqueue(enc.encode(html));
+      }
+    });
+  }
+
+  var NAV_RUNTIME = "(function(){"
+    + "document.addEventListener('click',function(e){"
+    +   "var a=e.target.closest('a[href]');"
+    +   "if(!a)return;"
+    +   "var h=a.getAttribute('href');"
+    +   "if(!h||h.indexOf('javascript:')===0||h==='#')return;"
+    +   "e.preventDefault();"
+    +   "try{"
+    +     "var abs=new URL(h.replace('__GW__',''),location.href).href;"
+    +     "window.top.postMessage({type:'GW_NAV',url:abs},'*');"
+    +   "}catch(x){}"
+    + "},true);"
+    + "document.querySelectorAll('[src],[href]').forEach(function(el){"
+    +   "['src','href'].forEach(function(a){"
+    +     "var v=el.getAttribute(a);"
+    +     "if(v&&v.indexOf('__GW__')===0)el.setAttribute(a,v.slice(6));"
+    +   "});"
+    + "});"
+    + "})();";
+
+  function makeInjectTransform() {
+    var dec = new TextDecoder(), enc = new TextEncoder(), done = false;
+    return new TransformStream({
+      transform: function(chunk, ctrl) {
+        var html = dec.decode(chunk, { stream: true });
+        if (!done && html.indexOf("<head") > -1) {
+          html = html.replace("<head", "<sc" + "ript>" + NAV_RUNTIME + "<\/sc" + "ript><head");
+          done = true;
+        }
+        ctrl.enqueue(enc.encode(html));
+      }
+    });
+  }
+
+  function makeMonitor(label) {
+    var n = 0, b = 0;
+    return new TransformStream({
+      transform: function(chunk, ctrl) {
+        n++; b += chunk.byteLength || 0;
+        if (n % 10 === 0) log("in", "[" + label + "] chunks=" + n + " bytes=" + b);
+        ctrl.enqueue(chunk);
+      },
+      flush: function() { log("ok", "[" + label + "] complete. chunks=" + n + " bytes=" + b); }
+    });
+  }
+
+  // ============================================================
+  //  MAIN FETCH — routes through our Cloudflare Worker
+  // ============================================================
+  async function fetchAndProxy(target) {
+    errorPane.classList.remove("show");
+    loadOverlay.classList.remove("hidden");
+    proxyFrame.style.display = "none";
+    statusDot.style.background = "#f59e0b";
+    statusText.textContent = "Fetching via gateway worker...";
+    loadLabel.textContent = "Contacting Cloudflare Worker...";
+    log("in", "PIPELINE START: " + target);
+
+    var resp = null;
+    try {
+      // Send request to our own Cloudflare Worker bare server
+      resp = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ url: target })
+      });
+
+      if (!resp.ok) {
+        throw new Error("Worker returned " + resp.status + " " + resp.statusText);
+      }
+    } catch(e) {
+      showErr("Gateway Worker error: " + e.message + "\n\nMake sure WORKER_URL is set correctly in proxy.html.");
+      log("er", "Worker fetch failed: " + e.message);
+      return;
+    }
+
+    log("ok", "Worker connected. Running stream pipeline...");
+    statusText.textContent = "Streaming " + new URL(target).hostname + "...";
+    loadLabel.textContent = "Running TransformStream pipeline...";
+
+    try {
+      var ct = resp.headers.get("content-type") || "text/html";
+      var html = "";
+
+      if (ct.indexOf("text/html") > -1) {
+        var stream = resp.body
+          .pipeThrough(makeURLTransform(target))
+          .pipeThrough(makeInjectTransform())
+          .pipeThrough(makeMonitor("HTML"));
+
+        var reader = stream.getReader();
+        var dec = new TextDecoder();
+        var parts = [];
+        while (true) {
+          var chunk = await reader.read();
+          if (chunk.done) break;
+          parts.push(dec.decode(chunk.value, { stream: true }));
+        }
+        html = parts.join("");
+        log("ok", "HTML assembled: " + html.length + " chars");
+      } else {
+        var txt = await resp.text();
+        html = "<html><body style=\"background:#0b0d14;color:#e2e8f0;font-family:monospace;padding:20px;white-space:pre-wrap\">" + txt + "</body></html>";
+        log("ok", "Non-HTML wrapped (" + ct + ")");
+      }
+
+      loadLabel.textContent = "Rendering in isolated frame...";
+      proxyFrame.srcdoc = html;
+      proxyFrame.style.display = "block";
+
+      await new Promise(function(res) { proxyFrame.onload = res; setTimeout(res, 3000); });
+
+      loadOverlay.classList.add("hidden");
+      statusDot.style.background = "#22c55e";
+      statusText.textContent = "Proxied: " + target;
+      log("ok", "RENDER COMPLETE");
+      currentURL = target;
+      urlBar.value = target;
+
+    } catch(e) {
+      showErr("Stream pipeline error: " + e.message);
+      log("er", "Pipeline exception: " + e.message);
+    }
+  }
+
+  function showErr(msg) {
+    loadOverlay.classList.add("hidden");
+    proxyFrame.style.display = "none";
+    errorPane.classList.add("show");
+    document.getElementById("errorText").textContent = msg;
+    statusDot.style.background = "#ef4444";
+    statusText.textContent = "Gateway error";
+  }
+
+  // Navigation messages from injected runtime
+  window.addEventListener("message", function(e) {
+    if (e.data && e.data.type === "GW_NAV") {
+      log("in", "Nav intercept: " + e.data.url);
+      fetchAndProxy(e.data.url);
+    }
+  });
+
+  function go() {
+    var u = urlBar.value.trim();
+    if (!u) return;
+    if (!/^https?:\/\//i.test(u)) u = "https://" + u;
+    fetchAndProxy(u);
+  }
+
+  // UI bindings
+  document.getElementById("goBtn").onclick = go;
+  document.getElementById("reloadBtn").onclick = function() { fetchAndProxy(currentURL); };
+  document.getElementById("exitBtn").onclick = function() { location.href = CLEVER_URL; };
+  document.getElementById("retryBtn").onclick = function() { fetchAndProxy(currentURL); };
+  document.getElementById("monitorBtn").onclick = function() { streamPanel.classList.toggle("open"); };
+  document.getElementById("closeMonitor").onclick = function() { streamPanel.classList.remove("open"); };
+  urlBar.addEventListener("keydown", function(e) { if (e.key === "Enter") go(); });
+  document.addEventListener("keydown", function(e) {
+    if (e.key === "~" || e.key === "`") location.href = CLEVER_URL;
+  });
+
+  log("in", "Scramjet Gateway Engine v2.0 ready.");
+  log("in", "Origin: " + location.origin);
+  log("in", "Worker: " + WORKER_URL);
+  fetchAndProxy(DEFAULT_TARGET);
+</script>
+</body>
+</html>
