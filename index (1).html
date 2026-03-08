@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Clever | Log in</title>
+  <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAANCAIAAAASSxgVAAABqUlEQVR4nBSRQWsUQRCF6/X0dByXFTdqokZMNLkYsgoiay4eIogXRdCDoPgbFDz7A8SbFy8ePOi/8CQYQtSwhyW4GxQPJiOuWTTJrpOe7qrU3PrRVa++qmeXHu+BiYRCiViKEVEZAyBIQRDmaCxYH6TfYymfmpCpcXGW8j7yHP92YRjaZkWIA51sxAc3cWfJEdnKlmS951++iV97iVrbcl+O1/npw6TVzH5shvZ6EQPNzSRz027+/KjbFYlk1W1xgVrNQ93v/vnrot2xHDF7xs/PxtU1FzxcIraeyWLThEAfPpVrnXTqmFLTYNu+/5lmTrRCFMsCkw0oRH+baw7eiy+g/kfrbEhnAVFM9NIfKCkmxs1oqK1IrcQSgz+IvlpN68zODlbabC2utdLLF8o8l9+/qJaFe7f9kRrvj/RUUmEuf5HPV/9fuZg9e2LaHR8jnZt2lxbsicbw7btEXW2aKKZ58So+uju8dWNs5uxhIk2AV1aLj8vgkpQM1+/vKX/wnDk6rRefZAPZ2kryTez+pcRApdVMNKzUoBjRRg/fNipZIYNSC92PBQcAAAD//3CcGhwAAAAGSURBVAMAyfHjzgCunJ0AAAAASUVORK5CYII=">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0b0d14;--surface:#12151f;--border:#1e2235;--accent:#4f6ef7;--accent2:#7c3aed;--text:#e2e8f0;--muted:#64748b;--danger:#ef4444;--success:#22c55e;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+    body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(79,110,247,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(79,110,247,.07) 1px,transparent 1px);background-size:48px 48px;animation:gridScroll 24s linear infinite;pointer-events:none;z-index:0;}
+    @keyframes gridScroll{0%{background-position:0 0}100%{background-position:48px 48px}}
+    .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;}
+    .orb1{width:420px;height:420px;background:rgba(79,110,247,.18);top:-100px;left:-100px;animation:orbPulse 8s ease-in-out infinite;}
+    .orb2{width:360px;height:360px;background:rgba(124,58,237,.14);bottom:-80px;right:-80px;animation:orbPulse 10s ease-in-out infinite reverse;}
+    @keyframes orbPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.15);opacity:1}}
+    .panel{position:relative;z-index:10;width:420px;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px 36px 36px;box-shadow:0 0 0 1px rgba(79,110,247,.08),0 32px 64px rgba(0,0,0,.6);animation:panelIn .5s cubic-bezier(.22,.68,0,1.2) both;}
+    @keyframes panelIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .logo-row{display:flex;align-items:center;gap:12px;margin-bottom:28px;}
+    .logo-icon{width:38px;height:38px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 0 20px rgba(79,110,247,.4);}
+    .logo-text{font-family:'Space Mono',monospace;font-size:15px;font-weight:700;letter-spacing:.03em;line-height:1.2;}
+    .logo-text span{display:block;font-size:11px;color:var(--muted);font-weight:400;letter-spacing:.06em;}
+    label{display:block;font-size:12px;font-weight:500;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;}
+    .field{margin-bottom:16px;}
+    input[type="password"]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'Space Mono',monospace;font-size:14px;transition:border-color .2s,box-shadow .2s;outline:none;}
+    input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,110,247,.15);}
+    .btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:.02em;margin-top:8px;position:relative;overflow:hidden;transition:opacity .2s,transform .15s;box-shadow:0 0 24px rgba(79,110,247,.35);}
+    .btn:hover{opacity:.92;transform:translateY(-1px);}
+    .btn::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);animation:shimmer 2.5s infinite;}
+    @keyframes shimmer{0%{left:-100%}100%{left:200%}}
+    .error-msg{color:var(--danger);font-size:13px;min-height:20px;margin-top:10px;text-align:center;}
+    .hint{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--muted);text-align:center;line-height:1.6;}
+    .hint kbd{background:var(--border);color:var(--text);border-radius:4px;padding:1px 6px;font-family:'Space Mono',monospace;font-size:11px;}
+    .success-state{text-align:center;}
+    .success-state h2{font-family:'Space Mono',monospace;font-size:18px;margin-bottom:8px;}
+    .pulse-dot{display:inline-block;width:10px;height:10px;background:var(--success);border-radius:50%;margin-right:8px;animation:pulseDot 1.5s ease-out infinite;}
+    @keyframes pulseDot{0%{box-shadow:0 0 0 0 rgba(34,197,94,.6)}70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  </style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="panel" id="panel">
+  <div class="logo-row">
+    <div class="logo-icon">&#9889;</div>
+    <div class="logo-text">SCRAMJET PROXY<span>BROWSER ENGINE v1.0</span></div>
+  </div>
+  <div class="field">
+    <label>Access Key</label>
+    <input type="password" id="accessKey" placeholder="Enter your access key" autocomplete="off"/>
+  </div>
+  <button class="btn" id="loginBtn">LAUNCH ENGINE &rarr;</button>
+  <div class="error-msg" id="errorMsg"></div>
+  <div class="hint">Powered by Scramjet &middot; Opens in isolated tab<br>Press <kbd>~</kbd> inside the proxy to exit to Clever</div>
+</div>
+
+<script>
+// ============================================================
+//  OWNER-CONFIGURABLE ACCESS KEYS
+//  Edit this array to add / remove / change keys
+// ============================================================
+var ACCESS_KEYS = [
+  "proxy-alpha-2024",
+  "scramjet-beta-key",
+  "demo1234"
+];
+
+var CLEVER_URL = "https://clever.com/oauth/authorize?channel=clever&client_id=4c63c1cf623dce82caac&confirmed=true&redirect_uri=https%3A%2F%2Fclever.com%2Fin%2Fauth_callback&response_type=code&state=72ebd98f122166e9e516fb2c8aae1f8085300648e43a91970179fc4dc8cd1827&district_id=5d4d9facff76bc000146dc2c";
+
+var DEFAULT_TARGET = "https://www.google.com";
+
+// ============================================================
+//  BUILD POPUP HTML
+//  Uses only string concatenation — zero nested template literals
+//  so there are no backtick/escape conflicts whatsoever
+// ============================================================
+function buildPopupHTML(cleverURL, startTarget) {
+
+  /* -- CSS for the popup (plain string) ---------------------- */
+  var css = ""
+    + ":root{--bg:#0b0d14;--surface:#12151f;--border:#1e2235;"
+    + "--accent:#4f6ef7;--accent2:#7c3aed;--text:#e2e8f0;"
+    + "--muted:#64748b;--danger:#ef4444;--success:#22c55e;}"
+    + "*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}"
+    + "body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;"
+    +   "height:100vh;display:flex;flex-direction:column;overflow:hidden;}"
+    + "#toolbar{display:flex;align-items:center;gap:10px;background:var(--surface);"
+    +   "border-bottom:1px solid var(--border);padding:8px 14px;flex-shrink:0;}"
+    + ".tb-logo{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;"
+    +   "color:var(--accent);letter-spacing:.08em;flex-shrink:0;}"
+    + "#urlBar{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:6px;"
+    +   "padding:7px 12px;color:var(--text);font-family:'Space Mono',monospace;"
+    +   "font-size:13px;outline:none;}"
+    + "#urlBar:focus{border-color:var(--accent);}"
+    + ".tb-btn{background:var(--border);border:none;border-radius:6px;color:var(--text);"
+    +   "padding:7px 12px;cursor:pointer;font-size:13px;font-weight:600;"
+    +   "transition:background .15s;flex-shrink:0;white-space:nowrap;}"
+    + ".tb-btn:hover{background:var(--accent);}"
+    + ".tb-btn.danger:hover{background:var(--danger);}"
+    + "#statusBar{background:var(--surface);border-bottom:1px solid var(--border);"
+    +   "padding:4px 14px;font-size:11px;color:var(--muted);"
+    +   "font-family:'Space Mono',monospace;display:flex;align-items:center;gap:8px;flex-shrink:0;}"
+    + ".sdot{width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;transition:background .3s;}"
+    + "#contentArea{flex:1;overflow:hidden;position:relative;}"
+    + "#loadOverlay{position:absolute;inset:0;background:var(--bg);display:flex;"
+    +   "flex-direction:column;align-items:center;justify-content:center;"
+    +   "gap:18px;z-index:50;transition:opacity .3s;}"
+    + "#loadOverlay.hidden{opacity:0;pointer-events:none;}"
+    + ".spinner{width:44px;height:44px;border:3px solid var(--border);"
+    +   "border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}"
+    + "@keyframes spin{to{transform:rotate(360deg)}}"
+    + "#loadLabel{font-family:'Space Mono',monospace;font-size:13px;color:var(--muted);}"
+    + "#proxyFrame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;}"
+    + "#errorPane{position:absolute;inset:0;display:none;flex-direction:column;"
+    +   "align-items:center;justify-content:center;gap:16px;padding:40px;text-align:center;}"
+    + "#errorPane.show{display:flex;}"
+    + "#errorPane h2{font-family:'Space Mono',monospace;color:var(--danger);font-size:18px;}"
+    + "#errorPane p{color:var(--muted);font-size:14px;line-height:1.7;max-width:480px;}"
+    + ".retry-btn{background:var(--accent);color:white;border:none;border-radius:8px;"
+    +   "padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;}"
+    + "#streamPanel{position:fixed;bottom:0;left:0;right:0;height:0;"
+    +   "background:rgba(11,13,20,.97);border-top:1px solid var(--border);"
+    +   "overflow:hidden;transition:height .25s;z-index:200;"
+    +   "font-family:'Space Mono',monospace;font-size:12px;}"
+    + "#streamPanel.open{height:200px;}"
+    + ".sp-header{padding:6px 14px;border-bottom:1px solid var(--border);color:var(--accent);"
+    +   "font-size:11px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}"
+    + "#streamLog{height:calc(100% - 30px);overflow-y:auto;padding:8px 14px;"
+    +   "color:var(--muted);line-height:1.8;}"
+    + ".le .ts{color:var(--border);margin-right:8px;}"
+    + ".le .ok{color:var(--success);}"
+    + ".le .er{color:var(--danger);}"
+    + ".le .in{color:var(--accent);}";
+
+  /* -- Proxy runtime injected into proxied pages ------------- */
+  /* Written as concatenated strings — no backticks at all     */
+  var runtime = ""
+    + "(function(){"
+    + "document.addEventListener('click',function(e){"
+    +   "var a=e.target.closest('a[href]');"
+    +   "if(!a)return;"
+    +   "var h=a.getAttribute('href');"
+    +   "if(!h||h.indexOf('javascript:')===0||h==='#')return;"
+    +   "e.preventDefault();"
+    +   "try{"
+    +     "var abs=new URL(h.replace('__PRXY__',''),location.href).href;"
+    +     "window.top.postMessage({type:'SJ_NAV',url:abs},'*');"
+    +   "}catch(x){}"
+    + "},true);"
+    + "document.querySelectorAll('[src],[href]').forEach(function(el){"
+    +   "['src','href'].forEach(function(attr){"
+    +     "var v=el.getAttribute(attr);"
+    +     "if(v&&v.indexOf('__PRXY__')===0)el.setAttribute(attr,v.slice(8));"
+    +   "});"
+    + "});"
+    + "})();";
+
+  /* -- Main engine script ------------------------------------ */
+  var escapedClever = cleverURL.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  var escapedTarget = startTarget.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  var escapedRuntime = JSON.stringify(runtime); // safe serialisation
+
+  var script = ""
+    + "var CLEVER_URL='" + escapedClever + "';"
+    + "var currentURL='" + escapedTarget + "';"
+    + "var logEl=document.getElementById('streamLog');"
+    + "function log(cls,msg){"
+    +   "var ts=new Date().toISOString().split('T')[1].slice(0,8);"
+    +   "var d=document.createElement('div');d.className='le';"
+    +   "d.innerHTML='<span class=ts>'+ts+'</span><span class='+cls+'>'+msg+'</span>';"
+    +   "logEl.appendChild(d);logEl.scrollTop=logEl.scrollHeight;"
+    + "}"
+
+    /* TransformStream: rewrite URLs */
+    + "function makeURLTransform(base){"
+    +   "var dec=new TextDecoder(),enc=new TextEncoder();"
+    +   "return new TransformStream({"
+    +     "transform:function(chunk,ctrl){"
+    +       "var html=dec.decode(chunk,{stream:true});"
+    +       "html=html.replace(/(src|href|action)=[\"'](?!data:|javascript:|#|mailto:)([^\"']+)[\"']/gi,function(m,attr,url){"
+    +         "try{return attr+'=\"__PRXY__'+new URL(url,base).href+'\"';}catch(e){return m;}"
+    +       "});"
+    +       "html=html.replace(/url\\([\"']?(?!data:)([^\"')]+)[\"']?\\)/gi,function(m,url){"
+    +         "try{return 'url(\"__PRXY__'+new URL(url,base).href+'\")';}catch(e){return m;}"
+    +       "});"
+    +       "ctrl.enqueue(enc.encode(html));"
+    +     "}"
+    +   "});"
+    + "}"
+
+    /* TransformStream: inject runtime into <head> */
+    + "var RUNTIME=" + escapedRuntime + ";"
+    + "function makeInjectTransform(){"
+    +   "var dec=new TextDecoder(),enc=new TextEncoder(),done=false;"
+    +   "return new TransformStream({"
+    +     "transform:function(chunk,ctrl){"
+    +       "var html=dec.decode(chunk,{stream:true});"
+    +       "if(!done&&html.indexOf('<head')>-1){"
+    +         "html=html.replace('<head','<sc'+'ript>'+RUNTIME+'<\\/sc'+'ript><head');"
+    +         "done=true;"
+    +       "}"
+    +       "ctrl.enqueue(enc.encode(html));"
+    +     "}"
+    +   "});"
+    + "}"
+
+    /* TransformStream: byte/chunk monitor */
+    + "function makeMonitor(label){"
+    +   "var n=0,b=0;"
+    +   "return new TransformStream({"
+    +     "transform:function(chunk,ctrl){"
+    +       "n++;b+=chunk.byteLength||0;"
+    +       "if(n%10===0)log('in','['+label+'] chunks='+n+' bytes='+b);"
+    +       "ctrl.enqueue(chunk);"
+    +     "},"
+    +     "flush:function(){log('ok','['+label+'] done. chunks='+n+' bytes='+b);}"
+    +   "});"
+    + "}"
+
+    /* Bare server endpoints — tries each in order */
+    + "var BARE_SERVERS=["
+    +   "'https://uv.holyubofficial.net/',"
+    +   "'https://bare.catplayer.org/',"
+    +   "'https://bare.notatetherball.com/'"
+    + "];"
+
+    /* Main pipeline */
+    + "async function fetchAndProxy(target){"
+    +   "errorPane.classList.remove('show');"
+    +   "loadOverlay.classList.remove('hidden');"
+    +   "proxyFrame.style.display='none';"
+    +   "statusDot.style.background='#f59e0b';"
+    +   "statusText.textContent='Fetching...';"
+    +   "loadLabel.textContent='Contacting bare server...';"
+    +   "log('in','PIPELINE START: '+target);"
+    +   "var resp=null;"
+    +   "for(var i=0;i<BARE_SERVERS.length;i++){"
+    +     "try{"
+    +       "var bare=BARE_SERVERS[i];"
+    +       "log('in','Trying bare server #'+(i+1)+': '+bare);"
+    +       "resp=await fetch(bare,{"
+    +         "headers:{"
+    +           "'X-Bare-URL':target,"
+    +           "'X-Bare-Headers':JSON.stringify({'User-Agent':'Mozilla/5.0','Accept':'text/html'}),"
+    +           "'X-Bare-Port':target.startsWith('https')?'443':'80',"
+    +           "'X-Bare-Protocol':target.startsWith('https')?'https:':'http:',"
+    +           "'X-Bare-Host':new URL(target).hostname"
+    +         "}"
+    +       "});"
+    +       "if(resp.ok){log('ok','Bare server #'+(i+1)+' connected.');break;}"
+    +       "else{log('er','Bare server #'+(i+1)+' returned '+resp.status);}"
+    +     "}catch(e){log('er','Bare server '+(i+1)+' failed: '+e.message);}"
+    +   "}"
+    +   "if(!resp||!resp.ok){"
+    +     "showErr('All bare servers failed for: '+target+'. The servers may be down or blocking requests.');"
+    +     "log('er','All bare servers exhausted.');return;"
+    +   "}"
+    +   "log('ok','Connected. Running stream pipeline...');"
+    +   "statusText.textContent='Streaming '+new URL(target).hostname+'...';"
+    +   "loadLabel.textContent='Running TransformStream pipeline...';"
+    +   "try{"
+    +     "var ct=resp.headers.get('content-type')||'text/html';"
+    +     "var html='';"
+    +     "if(ct.indexOf('text/html')>-1){"
+    +       "var stream=resp.body"
+    +         ".pipeThrough(makeURLTransform(target))"
+    +         ".pipeThrough(makeInjectTransform())"
+    +         ".pipeThrough(makeMonitor('HTML'));"
+    +       "var reader=stream.getReader(),dec=new TextDecoder(),parts=[];"
+    +       "var chunk;"
+    +       "while(true){chunk=await reader.read();if(chunk.done)break;"
+    +         "parts.push(dec.decode(chunk.value,{stream:true}));}"
+    +       "html=parts.join('');"
+    +       "log('ok','HTML assembled: '+html.length+' chars');"
+    +     "}else{"
+    +       "var txt=await resp.text();"
+    +       "html='<html><body style=\"background:#0b0d14;color:#e2e8f0;font-family:monospace;padding:20px;white-space:pre-wrap\">'+txt+'</body></html>';"
+    +       "log('ok','Non-HTML wrapped ('+ct+')');"
+    +     "}"
+    +     "loadLabel.textContent='Rendering in isolated frame...';"
+    +     "proxyFrame.srcdoc=html;"
+    +     "proxyFrame.style.display='block';"
+    +     "await new Promise(function(res){proxyFrame.onload=res;setTimeout(res,3000);});"
+    +     "loadOverlay.classList.add('hidden');"
+    +     "statusDot.style.background='#22c55e';"
+    +     "statusText.textContent='Proxied: '+target;"
+    +     "log('ok','RENDER COMPLETE');"
+    +     "currentURL=target;urlBar.value=target;"
+    +   "}catch(e){"
+    +     "showErr('Stream pipeline error: '+e.message);"
+    +     "log('er','Exception: '+e.message);"
+    +   "}"
+    + "}"
+
+    + "function showErr(msg){"
+    +   "loadOverlay.classList.add('hidden');"
+    +   "proxyFrame.style.display='none';"
+    +   "errorPane.classList.add('show');"
+    +   "document.getElementById('errorText').textContent=msg;"
+    +   "statusDot.style.background='#ef4444';"
+    +   "statusText.textContent='Pipeline error';"
+    + "}"
+
+    + "window.addEventListener('message',function(e){"
+    +   "if(e.data&&e.data.type==='SJ_NAV'){log('in','Nav: '+e.data.url);fetchAndProxy(e.data.url);}"
+    + "});"
+
+    + "function go(){"
+    +   "var u=urlBar.value.trim();if(!u)return;"
+    +   "if(!/^https?:\\/\\//i.test(u))u='https://'+u;"
+    +   "fetchAndProxy(u);"
+    + "}"
+
+    + "var urlBar=document.getElementById('urlBar');"
+    + "var loadOverlay=document.getElementById('loadOverlay');"
+    + "var loadLabel=document.getElementById('loadLabel');"
+    + "var proxyFrame=document.getElementById('proxyFrame');"
+    + "var errorPane=document.getElementById('errorPane');"
+    + "var statusDot=document.getElementById('statusDot');"
+    + "var statusText=document.getElementById('statusText');"
+    + "var streamPanel=document.getElementById('streamPanel');"
+
+    + "document.getElementById('goBtn').onclick=go;"
+    + "document.getElementById('reloadBtn').onclick=function(){fetchAndProxy(currentURL);};"
+    + "document.getElementById('exitBtn').onclick=function(){location.href=CLEVER_URL;};"
+    + "document.getElementById('retryBtn').onclick=function(){fetchAndProxy(currentURL);};"
+    + "document.getElementById('monitorBtn').onclick=function(){streamPanel.classList.toggle('open');};"
+    + "document.getElementById('closeMonitor').onclick=function(){streamPanel.classList.remove('open');};"
+    + "urlBar.addEventListener('keydown',function(e){if(e.key==='Enter')go();});"
+    + "document.addEventListener('keydown',function(e){"
+    +   "if(e.key==='~'||e.key==='`')location.href=CLEVER_URL;"
+    + "});"
+
+    + "log('in','Scramjet Browser Proxy Engine ready.');"
+    + "log('in','APIs: TransformStream, ReadableStream.pipeThrough, fetch');"
+    + "fetchAndProxy(currentURL);";
+
+  /* -- Assemble full popup document -------------------------- */
+  var safeTarget = startTarget.replace(/'/g, "\\'");
+
+  return "<!DOCTYPE html>"
+    + "<html lang=en><head><meta charset=UTF-8>"
+    + "<title>Scramjet Proxy</title>"
+    + "<link href='https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap' rel=stylesheet>"
+    + "<style>" + css + "</style>"
+    + "</head><body>"
+
+    + "<div id=toolbar>"
+    +   "<span class=tb-logo>&#9889; SCRAMJET</span>"
+    +   "<input id=urlBar type=text placeholder='Enter URL...' value='" + safeTarget + "'/>"
+    +   "<button class=tb-btn id=goBtn>GO</button>"
+    +   "<button class=tb-btn id=reloadBtn>&#8634;</button>"
+    +   "<button class=tb-btn id=monitorBtn>STREAMS</button>"
+    +   "<button class='tb-btn danger' id=exitBtn>EXIT &#8594; CLEVER</button>"
+    + "</div>"
+
+    + "<div id=statusBar>"
+    +   "<div class=sdot id=statusDot></div>"
+    +   "<span id=statusText>Initializing...</span>"
+    + "</div>"
+
+    + "<div id=contentArea>"
+    +   "<div id=loadOverlay>"
+    +     "<div class=spinner></div>"
+    +     "<div id=loadLabel>Building stream pipeline...</div>"
+    +   "</div>"
+    +   "<iframe id=proxyFrame sandbox='allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-modals' allowfullscreen></iframe>"
+    +   "<div id=errorPane>"
+    +     "<h2>&#9888; PIPELINE ERROR</h2>"
+    +     "<p id=errorText></p>"
+    +     "<button class=retry-btn id=retryBtn>RETRY</button>"
+    +   "</div>"
+    + "</div>"
+
+    + "<div id=streamPanel>"
+    +   "<div class=sp-header>"
+    +     "<span>SCRAMJET STREAM MONITOR</span>"
+    +     "<span id=closeMonitor style='cursor:pointer'>&#10005; CLOSE</span>"
+    +   "</div>"
+    +   "<div id=streamLog></div>"
+    + "</div>"
+
+    + "<sc" + "ript>" + script + "<\/sc" + "ript>"
+    + "</body></html>";
+}
+
+// ============================================================
+//  LOGIN
+// ============================================================
+function validate(key) {
+  return ACCESS_KEYS.indexOf(key.trim()) !== -1;
+}
+
+function launch() {
+  var key = document.getElementById("accessKey").value;
+  var err = document.getElementById("errorMsg");
+  var inp = document.getElementById("accessKey");
+
+  if (!validate(key)) {
+    err.textContent = "Invalid access key. Contact your administrator.";
+    inp.style.borderColor = "var(--danger)";
+    return;
+  }
+
+  err.textContent = "";
+  inp.style.borderColor = "";
+
+  var popup = window.open(
+    "about:blank", "_blank",
+    "width=1280,height=820,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes"
+  );
+
+  if (!popup) {
+    err.textContent = "Popup blocked — please allow popups for this page.";
+    return;
+  }
+
+  var html = buildPopupHTML(CLEVER_URL, DEFAULT_TARGET);
+  popup.document.open();
+  popup.document.write(html);
+  popup.document.close();
+
+  // Success state on launcher
+  document.getElementById("panel").innerHTML =
+      "<div class='logo-row'>"
+    + "<div class='logo-icon'>&#9889;</div>"
+    + "<div class='logo-text'>SCRAMJET PROXY<span>ENGINE ACTIVE</span></div>"
+    + "</div>"
+    + "<div class='success-state'>"
+    + "<h2><span class='pulse-dot'></span>Pipeline running</h2>"
+    + "<p style='margin-top:12px;color:var(--muted);font-size:14px;line-height:1.7'>"
+    + "Scramjet proxy is active in your new tab.<br><br>"
+    + "Press <kbd style='background:var(--border);border-radius:4px;padding:1px 6px;"
+    + "font-family:monospace;font-size:11px'>~</kbd> inside to exit to Clever.</p>"
+    + "</div>";
+}
+
+document.getElementById("loginBtn").addEventListener("click", launch);
+document.getElementById("accessKey").addEventListener("keydown", function(e) {
+  if (e.key === "Enter") launch();
+});
+</script>
+</body>
+</html>
